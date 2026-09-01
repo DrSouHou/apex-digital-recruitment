@@ -1,0 +1,22 @@
+[
+  {
+    "fullName": "Yassine Alami",
+    "email": "yassine.alami@uib.ac.ma",
+    "whatsapp": "+212612345678",
+    "filiere": "GDIAS - Genie Digital & IA en Sante",
+    "academicYear": "1ere annee",
+    "primaryCell": "Tech & Innovation",
+    "secondaryCell": "Evenementiel & Competitions",
+    "interests": [
+      "IA & Deep Learning",
+      "IoT & Embarque (ESP32)"
+    ],
+    "motivation": "Je souhaite rejoindre APEX DIGITAL pour developper des competences en IA biomedicale et participer aux hackathons.",
+    "pastProjects": "Projet IoT ESP32 de capteur de temperature.",
+    "portfolio": "https://github.com/yassine-alami",
+    "commitment": true,
+    "candidateId": "APEX-2026-0BED3",
+    "timestamp": "2026-08-27T23:08:56.638Z",
+    "webhookStatus": "sent"
+  }
+]

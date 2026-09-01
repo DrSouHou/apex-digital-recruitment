@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --bg-main: #FAFCFF;
+    --bg-surface: #FFFFFF;
+    --bg-subtle: #F1F5F9;
+    --border-color: #E2E8F0;
+    --navy-primary: #1B365D;
+    --navy-dark: #0F172A;
+    --orange-primary: #E06D24;
+    --orange-vibrant: #F97316;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+  }
+
+  .dark {
+    --bg-main: #0B1120;
+    --bg-surface: #131E33;
+    --bg-subtle: #1E293B;
+    --border-color: #1E293B;
+    --navy-primary: #1B365D;
+    --navy-dark: #0B1120;
+    --orange-primary: #E06D24;
+    --orange-vibrant: #F97316;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+  }
+
+  html {
+    background-color: #FAFCFF;
+    color: #0F172A;
+  }
+
+  html.dark {
+    background-color: #0B1120;
+    color: #F8FAFC;
+  }
+
+  body {
+    background-color: #FAFCFF;
+    color: #0F172A;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .dark body,
+  body.dark {
+    background-color: #0B1120;
+    color: #F8FAFC;
+  }
+}
+
+/* Subtle Technical Grid Background */
+.bg-tech-grid-light {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(27, 54, 93, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(27, 54, 93, 0.04) 1px, transparent 1px);
+}
+
+.bg-tech-grid-dark {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FAFCFF;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #0B1120;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #1e293b;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #E06D24;
+}
+
+/* Minimalist Tech Card Styles */
+.tech-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tech-card:hover {
+  border-color: rgba(249, 115, 22, 0.5);
+  transform: translateY(-2px);
+}
+
+.dark .tech-card {
+  background-color: #131E33;
+  border-color: #1E293B;
+}
+
+.dark .tech-card:hover {
+  border-color: rgba(249, 115, 22, 0.6);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px -3px rgba(249, 115, 22, 0.1);
+}
+
+/* Input Fields */
+.tech-input {
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: #0F172A;
+  transition: all 0.2s ease-in-out;
+}
+.tech-input:focus {
+  outline: none;
+  border-color: #F97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+.dark .tech-input {
+  background-color: #0F172A;
+  border-color: #334155;
+  color: #F8FAFC;
+}
+.dark .tech-input:focus {
+  outline: none;
+  border-color: #F97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25);
+  background-color: #131E33;
+}
+
+/* Typography Gradient Utilities */
+.gradient-text-orange {
+  background: linear-gradient(135deg, #1B365D 0%, #E06D24 60%, #F97316 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.dark .gradient-text-orange {
+  background: linear-gradient(135deg, #FFFFFF 10%, #FB923C 60%, #F97316 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-text-navy {
+  background: linear-gradient(135deg, #1B365D 0%, #0284C7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.dark .gradient-text-navy {
+  background: linear-gradient(135deg, #F8FAFC 0%, #38BDF8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
