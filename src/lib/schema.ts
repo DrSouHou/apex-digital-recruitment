@@ -9,11 +9,38 @@ import {
 export type { SchoolData };
 export { ACADEMIC_PROGRAMS, CURRENT_YEAR_OPTIONS, AGE_OPTIONS };
 
+export const isBlockedName = (name: string): boolean => {
+  if (!name) return false;
+  const clean = name
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+  const words = clean.split(/[\s\-_.]+/).filter(Boolean);
+
+  // Checks if the name contains both 'ali' and 'rami'
+  if (words.includes('ali') && words.includes('rami')) {
+    return true;
+  }
+
+  // Also catch concatenated variations like "alirami" or "ramiali"
+  const compact = clean.replace(/[^a-z0-9]/g, '');
+  if (compact.includes('alirami') || compact.includes('ramiali')) {
+    return true;
+  }
+
+  return false;
+};
+
 export const recruitmentFormSchema = z.object({
   // Step 1: Personal & Academic Info
   fullName: z
     .string()
-    .min(3, 'Veuillez saisir votre nom complet (minimum 3 caractères)'),
+    .min(3, 'Veuillez saisir votre nom complet (minimum 3 caractères)')
+    .refine((val) => !isBlockedName(val), {
+      message: 'Nom invalide / Name invalid',
+    }),
   email: z
     .string()
     .email('Adresse email invalide')
@@ -32,7 +59,10 @@ export const recruitmentFormSchema = z.object({
     .optional()
     .or(z.literal('')),
 
-  // Step 2: Technical Interests & Skills (Locked to Cellule Tech & Innovation)
+  // Step 2: Choix de la Cellule & Domaines de Compétences
+  primaryCell: z
+    .string()
+    .min(1, 'Veuillez sélectionner la cellule que vous souhaitez rejoindre'),
   interests: z
     .array(z.string())
     .min(1, "Veuillez sélectionner au moins un domaine d'intérêt ou compétence"),

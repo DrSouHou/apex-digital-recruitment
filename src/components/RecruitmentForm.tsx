@@ -9,6 +9,7 @@ import {
   ACADEMIC_PROGRAMS,
   CURRENT_YEAR_OPTIONS,
   AGE_OPTIONS,
+  isBlockedName,
 } from '@/lib/schema';
 import SuccessModal from './SuccessModal';
 import {
@@ -31,9 +32,11 @@ import {
   Layers,
   Clock,
   AlertCircle,
+  Palette,
+  Megaphone,
 } from 'lucide-react';
 
-const INTEREST_DOMAINS = [
+const TECH_INTEREST_DOMAINS = [
   'IA Biomédicale & Deep Learning',
   'Systèmes Embarqués & IoT (ESP32)',
   'Frontend React / Next.js / Tailwind',
@@ -43,6 +46,18 @@ const INTEREST_DOMAINS = [
   'Computer Vision & Edge AI (TinyML)',
   'Réseaux Sans-Fil (LoRa, BLE, WiFi)',
   'Cartographie WebGIS & Analyse de Données',
+];
+
+const COMM_INTEREST_DOMAINS = [
+  'Design UI/UX (Figma, Maquettage Web/Mobile)',
+  'Design Graphique & Branding (Illustrator, Photoshop)',
+  'Création de Contenu & Réseaux Sociaux (Instagram, LinkedIn)',
+  'Vidéographie & Montage Vidéo (Premiere Pro, CapCut)',
+  'Motion Design & Animation Visuelle (After Effects)',
+  'Photographie & Couverture Événementielle',
+  'Rédaction de Contenus & Copywriting (Storytelling)',
+  'Stratégie Marketing Digital & Campagnes Ads',
+  'Relations Publiques & Communication Événementielle',
 ];
 
 export default function RecruitmentForm() {
@@ -80,6 +95,7 @@ export default function RecruitmentForm() {
       filiere: '',
       currentYear: '',
       portfolioUrl: '',
+      primaryCell: 'Cellule Tech & Innovation',
       interests: ['IA Biomédicale & Deep Learning', 'Systèmes Embarqués & IoT (ESP32)'],
       motivation: '',
       pastExperience: '',
@@ -94,6 +110,33 @@ export default function RecruitmentForm() {
   const watchAge = watch('age') || '';
   const watchMotivation = watch('motivation') || '';
   const watchInterests = watch('interests') || [];
+  const watchPrimaryCell = watch('primaryCell') || 'Cellule Tech & Innovation';
+
+  React.useEffect(() => {
+    const handleSelectCellule = (e: any) => {
+      const selected = e.detail;
+      if (selected) {
+        handleCelluleSelect(selected);
+      }
+    };
+    window.addEventListener('select-cellule', handleSelectCellule);
+    return () => window.removeEventListener('select-cellule', handleSelectCellule);
+  }, []);
+
+  const handleCelluleSelect = (celluleName: string) => {
+    setValue('primaryCell', celluleName, { shouldValidate: true });
+    if (celluleName === 'Cellule Communication et Marketing') {
+      setValue('interests', [
+        'Design UI/UX (Figma, Maquettage Web/Mobile)',
+        'Création de Contenu & Réseaux Sociaux (Instagram, LinkedIn)',
+      ], { shouldValidate: true });
+    } else {
+      setValue('interests', [
+        'IA Biomédicale & Deep Learning',
+        'Systèmes Embarqués & IoT (ESP32)',
+      ], { shouldValidate: true });
+    }
+  };
 
   // Cascading lists
   const availableLevels =
@@ -169,8 +212,11 @@ export default function RecruitmentForm() {
         'currentYear',
         'portfolioUrl',
       ]);
+      if (isBlockedName(watch('fullName'))) {
+        isValid = false;
+      }
     } else if (currentStep === 2) {
-      isValid = await trigger(['interests']);
+      isValid = await trigger(['primaryCell', 'interests']);
     }
 
     if (isValid) {
@@ -188,18 +234,26 @@ export default function RecruitmentForm() {
   };
 
   const GOOGLE_SCRIPT_URL =
+    process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ||
     'https://script.google.com/macros/s/AKfycbzlqb7icR0N7nYg5EtszTFLVLE1sMaVBLtlm6xCELCV-nhPfYyD9IuS-lgb6R9wVWLU/exec';
 
   const onSubmit = async (data: RecruitmentFormData) => {
+    if (isBlockedName(data.fullName)) {
+      setErrorMessage('Nom invalide / Name invalid');
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage(null);
 
     const uniqueSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
-    const candidateCode = `APEX-TECH-${uniqueSuffix}`;
+    const isComm = data.primaryCell.includes('Communication');
+    const candidateCode = isComm ? `APEX-COMM-${uniqueSuffix}` : `APEX-TECH-${uniqueSuffix}`;
     const timestamp = new Date().toISOString();
     const schoolName = ACADEMIC_PROGRAMS[data.school]?.name || data.school;
 
     // Backend Payload strictly matched to Google Apps Script backend
+    // Includes aliases (primaryCell, cellule, cell, pole) so any script property reader works
     const payload = {
       fullName: data.fullName,
       age: data.age,
@@ -209,7 +263,10 @@ export default function RecruitmentForm() {
       accessLevel: data.accessLevel,
       filiere: data.filiere,
       currentYear: data.currentYear,
-      primaryCell: 'Cellule Tech & Innovation',
+      primaryCell: data.primaryCell,
+      cellule: data.primaryCell,
+      cell: data.primaryCell,
+      pole: data.primaryCell,
       interests: data.interests,
       motivation: data.motivation,
       commitment: data.commitmentArticle19,
@@ -255,7 +312,7 @@ export default function RecruitmentForm() {
         isOpen: true,
         candidateName: data.fullName,
         candidateId: result?.candidateId || candidateCode,
-        primaryCell: 'Cellule Tech & Innovation',
+        primaryCell: data.primaryCell,
       });
     } catch (error) {
       console.error('Submission failed:', error);
@@ -275,14 +332,14 @@ export default function RecruitmentForm() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-orange-500/10 border border-orange-500/25 text-xs font-semibold text-[#F97316] mb-3">
             <Award className="w-3.5 h-3.5" />
-            <span>RECRUTEMENT CELLULE TECH & INNOVATION • 2026–2027</span>
+            <span>CAMPAGNE DE RECRUTEMENT • 2026–2027</span>
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
-            Candidature <span className="gradient-text-orange">Tech & Innovation</span>
+            Rejoindre une <span className="gradient-text-orange">Cellule APEX DIGITAL</span>
           </h2>
           <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base max-w-xl mx-auto">
-            Rejoignez le pôle technique d'APEX DIGITAL pour développer des projets concrets en IoT, IA biomédicale et solutions durables.
+            Rejoignez notre équipe : postulez pour la <strong className="text-slate-900 dark:text-white font-semibold">Cellule Tech & Innovation</strong> ou la <strong className="text-slate-900 dark:text-white font-semibold">Cellule Communication & Marketing</strong> pour le mandat 2026–2027.
           </p>
         </div>
 
@@ -329,7 +386,7 @@ export default function RecruitmentForm() {
                   {currentStep > 2 ? <Check className="w-4 h-4" /> : '2'}
                 </div>
                 <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 mt-2 hidden sm:block">
-                  Compétences Tech
+                  Cellule & Compétences
                 </span>
               </div>
 
@@ -352,6 +409,8 @@ export default function RecruitmentForm() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)}>
+            {/* Hidden Input for Primary Cell */}
+            <input type="hidden" {...register('primaryCell')} />
             
             {/* ================= STEP 1: Personal & Academic Info ================= */}
             {currentStep === 1 && (
@@ -377,12 +436,23 @@ export default function RecruitmentForm() {
                       <input
                         type="text"
                         placeholder="ex: Amina Benali"
-                        {...register('fullName')}
-                        className="w-full tech-input rounded-xl py-2.5 pl-10 pr-4 text-xs sm:text-sm"
+                        {...register('fullName', {
+                          onChange: (e) => {
+                            if (isBlockedName(e.target.value)) {
+                              trigger('fullName');
+                            }
+                          },
+                          onBlur: () => {
+                            trigger('fullName');
+                          },
+                        })}
+                        className={`w-full tech-input rounded-xl py-2.5 pl-10 pr-4 text-xs sm:text-sm ${
+                          errors.fullName ? 'border-rose-500 ring-1 ring-rose-500' : ''
+                        }`}
                       />
                     </div>
                     {errors.fullName && (
-                      <p className="text-xs text-rose-500 mt-1">{errors.fullName.message}</p>
+                      <p className="text-xs text-rose-500 mt-1 font-medium">{errors.fullName.message}</p>
                     )}
                   </div>
 
@@ -579,13 +649,13 @@ export default function RecruitmentForm() {
                   {/* Portfolio URL */}
                   <div className="col-span-2 sm:col-span-1">
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
-                      Lien GitHub / LinkedIn / Portfolio <span className="text-slate-400 font-normal">(Optionnel)</span>
+                      Lien Portfolio / LinkedIn / GitHub / Behance <span className="text-slate-400 font-normal">(Optionnel)</span>
                     </label>
                     <div className="relative">
                       <LinkIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
                       <input
                         type="url"
-                        placeholder="https://github.com/mon-profil"
+                        placeholder="https://linkedin.com/in/... ou https://behance.net/..."
                         {...register('portfolioUrl')}
                         className="w-full tech-input rounded-xl py-2.5 pl-10 pr-4 text-xs sm:text-sm"
                       />
@@ -598,48 +668,189 @@ export default function RecruitmentForm() {
               </div>
             )}
 
-            {/* ================= STEP 2: Locked Tech & Innovation + Skills ================= */}
+            {/* ================= STEP 2: Cellule Choice & Skills ================= */}
             {currentStep === 2 && (
               <div className="space-y-6 animate-in fade-in duration-200">
                 <div className="border-b border-slate-200 dark:border-slate-800 pb-3 mb-5">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Cpu className="w-5 h-5 text-[#F97316]" />
-                    <span>Étape 2 : Compétences & Domaines Techniques</span>
+                    <Layers className="w-5 h-5 text-[#F97316]" />
+                    <span>Étape 2 : Choix de la Cellule & Domaines de Compétences</span>
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Sélectionnez vos domaines de compétence et d'intérêt pour les projets IoT & IA.
+                    Sélectionnez la cellule opérationnelle que vous souhaitez intégrer ainsi que vos compétences clés.
                   </p>
                 </div>
 
-                {/* Exclusive Informational Locked Badge */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#1B365D]/10 via-orange-500/10 to-[#1B365D]/10 border border-orange-500/30 flex items-start gap-3.5 shadow-sm">
-                  <div className="p-2.5 rounded-xl bg-orange-500/15 text-[#F97316] border border-orange-500/30 flex-shrink-0">
-                    <Cpu className="w-6 h-6" />
+                {/* Choosing Step: Cellule Selector Cards */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+                      Cellule à Rejoindre <span className="text-[#F97316]">*</span>
+                    </label>
+                    <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 font-mono">
+                      ● 2 Cellules Ouvertes au Recrutement
+                    </span>
                   </div>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                      <span className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                        <Lock className="w-3.5 h-3.5 text-[#F97316]" />
-                        Affectation : Cellule Tech & Innovation
-                      </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#F97316] text-white">
-                        IoT, IA & Prototypage
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Option 1: Cellule Tech & Innovation */}
+                    <div
+                      onClick={() => handleCelluleSelect('Cellule Tech & Innovation')}
+                      className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all ${
+                        watchPrimaryCell === 'Cellule Tech & Innovation'
+                          ? 'border-[#F97316] bg-orange-500/5 dark:bg-orange-950/20 shadow-md shadow-orange-500/10 ring-2 ring-orange-500/20'
+                          : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:border-slate-300 dark:hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`p-2.5 rounded-xl border transition-colors ${
+                              watchPrimaryCell === 'Cellule Tech & Innovation'
+                                ? 'bg-[#F97316] text-white border-[#F97316] shadow-sm'
+                                : 'bg-slate-100 dark:bg-slate-800 text-[#F97316] border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            <Cpu className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                              Cellule Tech & Innovation
+                            </h4>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                              Responsable : Mr. Souhail HAFIDI
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Selected Radio Indicator */}
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                            watchPrimaryCell === 'Cellule Tech & Innovation'
+                              ? 'border-[#F97316] bg-[#F97316] text-white'
+                              : 'border-slate-300 dark:border-slate-600'
+                          }`}
+                        >
+                          {watchPrimaryCell === 'Cellule Tech & Innovation' && (
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          )}
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-slate-600 dark:text-slate-300 mb-3 leading-relaxed">
+                        Systèmes Embarqués ESP32, IA biomédicale, Prototypage hardware & IoT, architectures Cloud & solutions Web.
+                      </p>
+
+                      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
+                        <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-orange-500/10 text-[#F97316] border border-orange-500/25">
+                          Recrutement Ouvert
+                        </span>
+                        <span className="text-[11px] font-medium text-slate-400">
+                          IoT, IA & Cloud
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Option 2: Cellule Communication et Marketing */}
+                    <div
+                      onClick={() => handleCelluleSelect('Cellule Communication et Marketing')}
+                      className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all ${
+                        watchPrimaryCell === 'Cellule Communication et Marketing'
+                          ? 'border-purple-500 bg-purple-500/5 dark:bg-purple-950/20 shadow-md shadow-purple-500/10 ring-2 ring-purple-500/20'
+                          : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:border-slate-300 dark:hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`p-2.5 rounded-xl border transition-colors ${
+                              watchPrimaryCell === 'Cellule Communication et Marketing'
+                                ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                                : 'bg-slate-100 dark:bg-slate-800 text-purple-600 dark:text-purple-400 border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            <Palette className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                              Cellule Communication et Marketing
+                            </h4>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                              Responsable : Mr. Hamza OUECHEN
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Selected Radio Indicator */}
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                            watchPrimaryCell === 'Cellule Communication et Marketing'
+                              ? 'border-purple-600 bg-purple-600 text-white'
+                              : 'border-slate-300 dark:border-slate-600'
+                          }`}
+                        >
+                          {watchPrimaryCell === 'Cellule Communication et Marketing' && (
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          )}
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-slate-600 dark:text-slate-300 mb-3 leading-relaxed">
+                        Design UI/UX, Identité visuelle & branding, Vidéographie & montage, Réseaux sociaux et couverture médiatique.
+                      </p>
+
+                      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
+                        <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/25 flex items-center gap-1">
+                          <Sparkles className="w-2.5 h-2.5" />
+                          Inscriptions Réouvertes
+                        </span>
+                        <span className="text-[11px] font-medium text-slate-400">
+                          UI/UX & Stratégie Digitale
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {errors.primaryCell && (
+                    <p className="text-xs text-rose-500 mt-2 font-medium">{errors.primaryCell.message}</p>
+                  )}
+
+                  {/* Informational Closed Status Bar */}
+                  <div className="mt-3.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+                    <div className="flex items-center gap-2">
+                      <Lock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>
+                        Autres cellules (Événementiel & Compétition, Partenariats B2B) :
                       </span>
                     </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      Cette session de recrutement est dédiée aux projets techniques de la <strong>Cellule Tech & Innovation</strong> (Systèmes Embarqués ESP32, IA biomédicale, Prototypage hardware & développement Web/Cloud).
-                    </p>
+                    <span className="font-semibold text-slate-500 dark:text-slate-400 bg-slate-200/60 dark:bg-slate-800/60 px-2 py-0.5 rounded">
+                      Inscriptions Clôturées
+                    </span>
                   </div>
                 </div>
 
                 {/* Domain Pills */}
-                <div className="pt-1">
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-2.5">
-                    Sélectionnez vos Domaines d'Intérêt & Compétences Clés <span className="text-[#F97316]">*</span>
-                  </label>
+                <div className="pt-2">
+                  <div className="flex items-center justify-between mb-2.5">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-200">
+                      Domaines d'Intérêt & Compétences Clés (
+                      {watchPrimaryCell === 'Cellule Communication et Marketing'
+                        ? 'Communication & Marketing'
+                        : 'Tech & Innovation'}
+                      ) <span className="text-[#F97316]">*</span>
+                    </label>
+                    <span className="text-[11px] font-medium text-slate-400">
+                      Sélectionnez au moins une compétence
+                    </span>
+                  </div>
+
                   <div className="flex flex-wrap gap-2">
-                    {INTEREST_DOMAINS.map((domain) => {
+                    {(watchPrimaryCell === 'Cellule Communication et Marketing'
+                      ? COMM_INTEREST_DOMAINS
+                      : TECH_INTEREST_DOMAINS
+                    ).map((domain) => {
                       const isSelected = watchInterests.includes(domain);
+                      const isComm = watchPrimaryCell === 'Cellule Communication et Marketing';
                       return (
                         <button
                           type="button"
@@ -647,7 +858,9 @@ export default function RecruitmentForm() {
                           onClick={() => toggleInterest(domain)}
                           className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                             isSelected
-                              ? 'bg-gradient-to-r from-[#E06D24] to-[#F97316] text-white shadow-sm'
+                              ? isComm
+                                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm'
+                                : 'bg-gradient-to-r from-[#E06D24] to-[#F97316] text-white shadow-sm'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                           }`}
                         >
@@ -658,7 +871,7 @@ export default function RecruitmentForm() {
                     })}
                   </div>
                   {errors.interests && (
-                    <p className="text-xs text-rose-500 mt-1.5">{errors.interests.message}</p>
+                    <p className="text-xs text-rose-500 mt-1.5 font-medium">{errors.interests.message}</p>
                   )}
                 </div>
               </div>
@@ -673,7 +886,11 @@ export default function RecruitmentForm() {
                     <span>Étape 3 : Motivation & Engagement Formel</span>
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Exprimez vos motivations et validez l'engagement de temps requis par le règlement intérieur.
+                    Exprimez vos motivations pour rejoindre la{' '}
+                    <strong className="text-slate-800 dark:text-slate-200">
+                      {watchPrimaryCell}
+                    </strong>{' '}
+                    et validez l'engagement de temps requis par le règlement intérieur.
                   </p>
                 </div>
 
@@ -681,7 +898,11 @@ export default function RecruitmentForm() {
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-200">
-                      Pourquoi souhaitez-vous rejoindre la Cellule Tech d'APEX DIGITAL ? <span className="text-[#F97316]">*</span>
+                      Pourquoi souhaitez-vous rejoindre la{' '}
+                      {watchPrimaryCell === 'Cellule Communication et Marketing'
+                        ? 'Cellule Communication & Marketing'
+                        : 'Cellule Tech & Innovation'}{' '}
+                      d'APEX DIGITAL ? <span className="text-[#F97316]">*</span>
                     </label>
                     <span
                       className={`text-xs font-mono font-semibold ${
@@ -695,7 +916,11 @@ export default function RecruitmentForm() {
                   </div>
                   <textarea
                     rows={4}
-                    placeholder="Décrivez vos motivations, ce que vous attendez du club APEX DIGITAL et ce que vous comptez apporter aux projets HealthTech / GreenTech..."
+                    placeholder={
+                      watchPrimaryCell === 'Cellule Communication et Marketing'
+                        ? "Décrivez vos motivations, votre sensibilité créative, les outils de communication que vous maîtrisez (Figma, Photoshop, Première, Réseaux Sociaux...) et vos attentes pour faire rayonner APEX DIGITAL..."
+                        : "Décrivez vos motivations, ce que vous attendez du club APEX DIGITAL et ce que vous comptez apporter aux projets HealthTech / GreenTech..."
+                    }
                     {...register('motivation')}
                     className="w-full tech-input rounded-xl p-3.5 text-xs sm:text-sm"
                   ></textarea>
@@ -707,11 +932,15 @@ export default function RecruitmentForm() {
                 {/* Past Experience */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
-                    Projets passés ou compétences clés <span className="text-slate-400 font-normal">(Optionnel)</span>
+                    Projets passés, réalisations ou compétences clés <span className="text-slate-400 font-normal">(Optionnel)</span>
                   </label>
                   <textarea
                     rows={3}
-                    placeholder="Hackathons passés, projets académiques, compétences logicielles ou électroniques..."
+                    placeholder={
+                      watchPrimaryCell === 'Cellule Communication et Marketing'
+                        ? "Créations graphiques antérieures, comptes réseaux sociaux gérés, tournages ou montages vidéo, portfolios visuels..."
+                        : "Hackathons passés, projets académiques, compétences logicielles ou électroniques..."
+                    }
                     {...register('pastExperience')}
                     className="w-full tech-input rounded-xl p-3.5 text-xs sm:text-sm"
                   ></textarea>

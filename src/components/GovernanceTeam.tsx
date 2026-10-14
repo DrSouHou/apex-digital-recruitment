@@ -1,24 +1,25 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Shield, Cpu, Trophy, Palette, Handshake, Users, Sparkles } from 'lucide-react';
+import { Shield, Cpu, Trophy, Palette, Handshake, Users, Sparkles, ChevronRight, UserPlus } from 'lucide-react';
 
 export interface TeamMember {
   name: string;
   role: string;
   subRole?: string;
   cellule?: string;
-  image: string;
-  initials: string;
+  image?: string;
+  initials?: string;
   mission?: string;
   description?: string;
   tags?: string[];
   icon?: React.ReactNode;
+  isOpen?: boolean;
 }
 
 export const boardMembers: TeamMember[] = [
   {
-    name: 'Adam DANI',
+    name: 'Mr. Adam DANI',
     role: 'Président',
     subRole: 'Présidium Exécutif',
     image: '/team/adam-dani.jpg',
@@ -26,7 +27,7 @@ export const boardMembers: TeamMember[] = [
     mission: 'Représentant légal, arbitrage stratégique et validation institutionnelle UIB.',
   },
   {
-    name: 'Samir BARRADAH',
+    name: 'Mr. Samir BARRADAH',
     role: 'Vice-Président',
     subRole: 'Co-Garant Exécutif',
     image: '/team/samir-barradah.jpg',
@@ -34,7 +35,7 @@ export const boardMembers: TeamMember[] = [
     mission: 'Coordination inter-cellules, adéquation budgétaire et co-contrôle exécutif.',
   },
   {
-    name: 'Mohamed LHIKIOUI',
+    name: 'Mr. Mohamed LHIKIOUI',
     role: 'Secrétaire Général',
     subRole: 'Gestion Administrative',
     image: '/team/mohamed-lhikioui.jpg',
@@ -42,18 +43,19 @@ export const boardMembers: TeamMember[] = [
     mission: 'Centralisation administrative, traçabilité des PV et circulation documentaire.',
   },
   {
-    name: 'Alae ABSI',
-    role: 'Trésorier',
+    name: 'Poste Ouvert',
+    role: 'Trésorier(e)',
     subRole: 'Gestion Financière',
-    image: '/team/alae-absi.jpg',
-    initials: 'AA',
-    mission: 'Gestionnaire opérationnel des fonds, bilans financiers et conformité budgétaire.',
+    image: '',
+    initials: '',
+    isOpen: true,
+    mission: 'Gestionnaire opérationnelle des fonds, bilans financiers et conformité budgétaire UIB.',
   },
 ];
 
 export const cellHeads: TeamMember[] = [
   {
-    name: 'M. Souhail HAFIDI',
+    name: 'Mr. Souhail HAFIDI',
     role: 'Responsable (Head)',
     cellule: 'Tech et Innovation',
     image: '/team/souhail-hafidi.jpg',
@@ -64,7 +66,7 @@ export const cellHeads: TeamMember[] = [
     tags: ['HealthTech', 'GreenTech', 'IoT ESP32', 'Deep Learning', 'Web/Cloud'],
   },
   {
-    name: 'M. Mohamed Amine MOUSTAID',
+    name: 'Mr. Mohamed Amine MOUSTAID',
     role: 'Responsable (Head)',
     cellule: 'Événementiel et Compétition',
     image: '/team/mohamed-amine-moustaid.jpg',
@@ -75,7 +77,7 @@ export const cellHeads: TeamMember[] = [
     tags: ['Grand Hackathon', 'Salons Tech', 'Workshops', 'Logistique'],
   },
   {
-    name: 'M. Hamza OUECHEN',
+    name: 'Mr. Hamza OUECHEN',
     role: 'Responsable (Head)',
     cellule: 'Communication et Marketing',
     image: '/team/hamza-ouechen.jpg',
@@ -86,7 +88,7 @@ export const cellHeads: TeamMember[] = [
     tags: ['Design UI/UX', 'Brand Identity', 'Social Media', 'Vidéographie'],
   },
   {
-    name: 'Mme Aya AJAFARI',
+    name: 'Mme. Aya AJAFARI',
     role: 'Responsable (Head)',
     cellule: 'Relations Extérieures / Partenariat',
     image: '/team/aya-ajafari.jpg',
@@ -97,15 +99,16 @@ export const cellHeads: TeamMember[] = [
     tags: ['Sponsorings', 'Partenariats B2B', 'Réseau Alumni', 'Conventions'],
   },
   {
-    name: 'M. Abderrahmane KHALYL',
+    name: 'Poste Ouvert',
     role: 'Responsable (Head)',
     cellule: 'Ressources Humaines et Cohésion',
-    image: '/team/abderrahmane-khalyl.jpg',
-    initials: 'AK',
-    icon: <Users className="w-5 h-5 text-amber-400" />,
+    image: '',
+    initials: '',
+    isOpen: true,
+    icon: <Users className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />,
     description:
       "Gestion du recrutement, intégration des nouveaux membres (Team Building), suivi de l'engagement hebdomadaire (règle des 3h/semaine) et cohésion interne.",
-    tags: ['Recrutement', 'Team Building', 'Suivi Membres', 'Médiation'],
+    tags: ['Recrutement', 'Team Building', 'Suivi Membres', 'Médiation', 'Poste Ouvert'],
   },
 ];
 
@@ -120,10 +123,23 @@ export function MemberAvatar({
 }) {
   const [hasError, setHasError] = useState(false);
 
+  if (member.isOpen) {
+    return (
+      <div
+        className={`relative ${sizeClass} rounded-full p-1 border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/70 bg-emerald-500/5 dark:bg-emerald-950/20 shadow-md flex-shrink-0 flex items-center justify-center ${className}`}
+      >
+        <div className="w-full h-full rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 flex flex-col items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
+          <UserPlus className="w-6 h-6 sm:w-7 sm:h-7" />
+          <span className="text-[8px] sm:text-[9px] font-bold font-mono tracking-wider uppercase mt-0.5">OPEN</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`relative ${sizeClass} rounded-full p-1 bg-gradient-to-tr from-[#E06D24] to-[#1B365D] shadow-md flex-shrink-0 ${className}`}>
       <div className="w-full h-full rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-        {!hasError ? (
+        {!hasError && member.image ? (
           <img
             src={member.image}
             alt={member.name}
@@ -132,7 +148,7 @@ export function MemberAvatar({
           />
         ) : (
           <span className="text-sm sm:text-base font-bold text-[#1B365D] dark:text-[#E06D24] font-mono">
-            {member.initials}
+            {member.initials || '?'}
           </span>
         )}
       </div>
@@ -178,19 +194,37 @@ export default function GovernanceTeam() {
             {boardMembers.map((exec, idx) => (
               <div
                 key={idx}
-                className="tech-card rounded-2xl p-6 flex flex-col items-center text-center group relative overflow-hidden"
+                className={`tech-card rounded-2xl p-6 flex flex-col items-center text-center group relative overflow-hidden ${
+                  exec.isOpen ? 'border-2 border-dashed border-emerald-500/40 bg-emerald-500/[0.02]' : ''
+                }`}
               >
                 {/* Subtle top role accent */}
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#1B365D] via-[#F97316] to-[#E06D24] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div
+                  className={`absolute top-0 inset-x-0 h-1 ${
+                    exec.isOpen
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+                      : 'bg-gradient-to-r from-[#1B365D] via-[#F97316] to-[#E06D24] opacity-0 group-hover:opacity-100 transition-opacity'
+                  }`}
+                ></div>
 
                 {/* Circular Avatar with Gradient Ring & Photo/Fallback */}
                 <MemberAvatar member={exec} sizeClass="w-20 h-20 sm:w-24 sm:h-24" className="mb-3 mx-auto" />
 
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 mb-2 border border-slate-200 dark:border-slate-700">
-                  {exec.subRole || exec.role}
+                <span
+                  className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wider mb-2 border ${
+                    exec.isOpen
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                  }`}
+                >
+                  {exec.isOpen ? 'Poste Ouvert' : (exec.subRole || exec.role)}
                 </span>
 
-                <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1">
+                <h4
+                  className={`text-base font-bold mb-1 ${
+                    exec.isOpen ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'
+                  }`}
+                >
                   {exec.name}
                 </h4>
 
@@ -202,6 +236,21 @@ export default function GovernanceTeam() {
                   <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-auto pt-3 border-t border-slate-100 dark:border-slate-800/80">
                     {exec.mission}
                   </p>
+                )}
+
+                {exec.isOpen && (
+                  <div className="mt-3.5 pt-3 border-t border-slate-100 dark:border-slate-800/80 w-full">
+                    <button
+                      onClick={() => {
+                        const el = document.getElementById('recruitment-form');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="w-full text-xs font-semibold px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <span>Postuler à ce poste</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 )}
               </div>
             ))}
@@ -226,7 +275,9 @@ export default function GovernanceTeam() {
             {cellHeads.map((cell, idx) => (
               <div
                 key={idx}
-                className="tech-card rounded-2xl p-6 flex flex-col justify-between group"
+                className={`tech-card rounded-2xl p-6 flex flex-col justify-between group ${
+                  cell.isOpen ? 'border-2 border-dashed border-emerald-500/40 bg-emerald-500/[0.02]' : ''
+                }`}
               >
                 <div>
                   {/* Card Header: Icon & Cell Title */}
@@ -239,17 +290,55 @@ export default function GovernanceTeam() {
                         {cell.cellule || cell.role}
                       </h4>
                     </div>
+
+                    {/* Status Badge */}
+                    {cell.isOpen ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 flex items-center gap-1">
+                        <Sparkles className="w-2.5 h-2.5" />
+                        Poste Ouvert
+                      </span>
+                    ) : cell.cellule === 'Tech et Innovation' ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-orange-500/10 text-[#F97316] border border-orange-500/25">
+                        Recrutement Ouvert
+                      </span>
+                    ) : cell.cellule === 'Communication et Marketing' ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/25 flex items-center gap-1">
+                        <Sparkles className="w-2.5 h-2.5" />
+                        Inscriptions Réouvertes
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono text-slate-400 border border-slate-200 dark:border-slate-700/60">
+                        Clôturé
+                      </span>
+                    )}
                   </div>
 
                   {/* Cell Responsable Head Profile Bubble with Avatar */}
-                  <div className="flex items-center space-x-3.5 p-3 rounded-xl bg-slate-100/70 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 mb-4">
+                  <div
+                    className={`flex items-center space-x-3.5 p-3 rounded-xl border mb-4 ${
+                      cell.isOpen
+                        ? 'bg-emerald-500/[0.04] border-emerald-500/30'
+                        : 'bg-slate-100/70 dark:bg-slate-900/70 border-slate-200 dark:border-slate-800'
+                    }`}
+                  >
                     <MemberAvatar member={cell} sizeClass="w-14 h-14" className="mb-0" />
                     <div>
                       <span className="text-[10px] font-mono font-semibold uppercase text-slate-500 dark:text-slate-400 block">
                         {cell.role}
                       </span>
-                      <p className="text-xs font-bold text-slate-900 dark:text-white">
+                      <p
+                        className={`text-xs font-bold ${
+                          cell.isOpen
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-slate-900 dark:text-white'
+                        }`}
+                      >
                         {cell.name}
+                        {cell.isOpen && (
+                          <span className="text-[10px] font-normal text-emerald-500 font-mono ml-1.5">
+                            (Open for Joining)
+                          </span>
+                        )}
                       </p>
                       <p className="text-[11px] text-[#F97316] font-medium">
                         {cell.cellule}
@@ -266,20 +355,53 @@ export default function GovernanceTeam() {
                 </div>
 
                 {/* Tags / Project tracks */}
-                {cell.tags && (
-                  <div className="pt-3 border-t border-slate-200 dark:border-slate-800/80">
-                    <div className="flex flex-wrap gap-1.5">
-                      {cell.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/80"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
+                <div>
+                  {cell.tags && (
+                    <div className="pt-3 border-t border-slate-200 dark:border-slate-800/80">
+                      <div className="flex flex-wrap gap-1.5">
+                        {cell.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/80"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+
+                  {/* CTA if cell is recruiting or open */}
+                  {(cell.cellule === 'Tech et Innovation' ||
+                    cell.cellule === 'Communication et Marketing' ||
+                    cell.isOpen) && (
+                    <div className="mt-3.5 pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                      <button
+                        onClick={() => {
+                          const targetCell =
+                            cell.cellule === 'Communication et Marketing'
+                              ? 'Cellule Communication et Marketing'
+                              : 'Cellule Tech & Innovation';
+                          window.dispatchEvent(
+                            new CustomEvent('select-cellule', { detail: targetCell })
+                          );
+                          const el = document.getElementById('recruitment-form');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className={`text-xs font-semibold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs ${
+                          cell.isOpen
+                            ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                            : cell.cellule === 'Communication et Marketing'
+                            ? 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/30'
+                            : 'bg-orange-500/10 hover:bg-orange-500/20 text-[#F97316] border border-orange-500/30'
+                        }`}
+                      >
+                        <span>{cell.isOpen ? 'Postuler pour cette cellule' : 'Rejoindre cette cellule'}</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>

@@ -23,9 +23,13 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'APEX DIGITAL' }],
   icons: {
-    icon: '/assets/apex-logo.png',
-    shortcut: '/assets/apex-logo.png',
-    apple: '/assets/apex-logo.png',
+    icon: [
+      { url: '/tab-icon.png', type: 'image/png' },
+      { url: '/icon.png', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    shortcut: '/tab-icon.png',
+    apple: '/tab-icon.png',
   },
   openGraph: {
     title: 'APEX DIGITAL | Recrutement 2026-2027 • Université Internationale Bleue (UIB)',
@@ -48,7 +52,9 @@ export default function RootLayout({
   return (
     <html lang="fr" className="light scroll-smooth" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/assets/apex-logo.png" type="image/png" />
+        <link rel="icon" href="/tab-icon.png" type="image/png" />
+        <link rel="shortcut icon" href="/tab-icon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/tab-icon.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

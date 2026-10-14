@@ -100,13 +100,13 @@ export default function SuccessModal({
           {/* Action Buttons */}
           <div className="w-full flex flex-col gap-3">
             <a
-              href="https://chat.whatsapp.com/demo-apex-2026"
+              href="https://whatsapp.com/channel/0029VbD8ZjdAzNbwVgidWd16"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-3.5 px-5 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer"
             >
               <MessageSquare className="w-4 h-4" />
-              <span>Rejoindre le Canal WhatsApp Candidats</span>
+              <span>Rejoindre la Chaîne WhatsApp APEX DIGITAL</span>
               <ExternalLink className="w-3.5 h-3.5 opacity-80" />
             </a>
 
